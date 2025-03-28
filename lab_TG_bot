@@ -1,0 +1,40 @@
+```python
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Словарь для хранения соответствия тестов и пробирок
+test_to_tube = {
+    "общий анализ крови": "фиолетовая пробирка (EDTA)",
+    "биохимический анализ крови": "красная пробирка (сыворотка)",
+    "анализ на глюкозу": "серая пробирка (фторид натрия)",
+    "коагулограмма": "синяя пробирка (цитрат натрия)",
+    "группа крови и резус-фактор": "красная пробирка (сыворотка)"
+   "мазок со слизистой зева на ДНК mycoplasma pneumoniae (ПЦР)": "пробирка типа ДНК-экспресс с защелкивающейся крышкой и лизирующим раствором (мазок)"
+}
+
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет! Я бот для выбора пробирок для анализов. Введите название теста, и я подскажу, какую пробирку использовать.')
+
+def handle_test(update: Update, context: CallbackContext) -> None:
+    test = update.message.text.lower()
+    if test in test_to_tube:
+        tube = test_to_tube[test]
+        update.message.reply_text(f'Для {test} используйте {tube}.')
+    else:
+        update.message.reply_text('Извините, я не знаю такой тест. Попробуйте другой.')
+
+def main() -> None:
+    # Замените 'YOUR_TOKEN' на ваш токен бота
+    updater = Updater("YOUR_TOKEN")
+
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_test))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
+```
